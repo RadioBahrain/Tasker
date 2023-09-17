@@ -19,7 +19,6 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const core = require('@actions/core');
             const fs = require('fs');
             const path = require('path');
             
@@ -37,7 +36,7 @@ jobs:
               fs.writeFileSync(path.resolve(__dirname, 'tasks_manifesto.md'), tasks);
               core.setOutput('tasks', tasks);
             }
-            
+
       - name: Commit changes
         run: |
           git config --global user.name 'Github Actions Bot'
@@ -45,21 +44,17 @@ jobs:
           git add -A
           git commit -m ':sparkles: tasks updated.' || echo "No changes to commit"
           
-      - name: Push Tasks to Repo
-        run: git push || echo "No changes to push"
-
       - name: Create New Issue from Manifesto
         uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const github = require('@actions/github');
             const fs = require('fs');
             const path = require('path');
             
-            const octokit = github.getOctokit(core.getInput('github-token'));
             const tasks = fs.readFileSync(path.resolve(__dirname, 'tasks_manifesto.md'), 'utf8');
 
-            octokit.issues.create({
+            github.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: 'New Task Manifesto Issue',
