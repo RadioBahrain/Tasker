@@ -6,37 +6,20 @@ jobs:
   new_issue:
     name: New Issue Job
     runs-on: ubuntu-latest
+    env:
+      ISSUE_NUMBER: ${{ github.event.issue.number }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
         
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
-          node-version: '14'
+          php-version: '8.0'
           
-      - name: Update Task Manager 
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const fs = require('fs');
-            const path = require('path');
-            
-            let tasks = fs.readFileSync(path.resolve(__dirname, 'tasks_manifesto.md'), 'utf8');
-            const issue = context.issue;
-            const issueNumber = issue.number;
-            
-            let taskExists = tasks.includes(`| ${issueNumber} |`);
-            
-            if (taskExists) {
-              core.setFailed('Task already exists.');
-            } else {
-              // Your task creation logic here...
-              // ...
-              fs.writeFileSync(path.resolve(__dirname, 'tasks_manifesto.md'), tasks);
-              core.setOutput('tasks', tasks);
-            }
-
+      - name: Update Task Manager with PHP
+        run: php update_tasks_manifesto.php
+        
       - name: Commit changes
         run: |
           git config --global user.name 'Github Actions Bot'
@@ -44,19 +27,5 @@ jobs:
           git add -A
           git commit -m ':sparkles: tasks updated.' || echo "No changes to commit"
           
-      - name: Create New Issue from Manifesto
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const fs = require('fs');
-            const path = require('path');
-            
-            const tasks = fs.readFileSync(path.resolve(__dirname, 'tasks_manifesto.md'), 'utf8');
-
-            github.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: 'New Task Manifesto Issue',
-              body: tasks
-            });
+      - name: Push Tasks to Repo
+        run: git push || echo "No changes to push"
