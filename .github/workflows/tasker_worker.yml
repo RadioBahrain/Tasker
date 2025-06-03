@@ -18,7 +18,7 @@ jobs:
           php-version: '8.3'
 
       - name: Update Task Manager with PHP
-        run: php ./tasker.php
+        run: php .github/workflows/tasker.php
 
       - name: Commit changes
         run: |
