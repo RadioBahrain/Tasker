@@ -8,6 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ISSUE_NUMBER: ${{ github.event.issue.number }}
+      ISSUE_TITLE: ${{ github.event.issue.title }}
+      GITHUB_WORKSPACE: ${{ github.workspace }}
+      YOUTUBE_CLIENT_JSON: ${{ secrets.YOUTUBE_CLIENT_JSON }}
+      YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -16,6 +20,9 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
+
+      - name: Install Google API PHP Client
+        run: composer require google/apiclient
 
       - name: Update Task Manager with PHP
         run: php .github/workflows/tasker.php
