@@ -1,0 +1,14 @@
+{
+    "name": "arbaab/tasker",
+    "description": "A GitHub Action PHP app for task management and YouTube livestream scheduling",
+    "type": "project",
+    "require": {
+        "php": ">=7.4",
+        "google/apiclient": "^2.12.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Tasker\\": "app/"
+        }
+    }
+}
